@@ -15,6 +15,12 @@ type XmrstakApiResponse struct {
   HashRate struct {
     Total []float64
   }
+  Results struct {
+    Difficulty int `json:"diff_current"`
+    SharesGood int `json:"shares_good"`
+    SharesTotal int `json:"shares_total"`
+    AvgResultTime float64 `json:"avg_time"`
+  }
 }
 
 const (
@@ -36,7 +42,7 @@ func getEnv(key, fallback string) string {
   return fallback
 }
 
-func getHashrate() float64 {
+func getXmrstakData() XmrstakApiResponse {
   resp, err := http.Get(xmrstakApiUrl)
   if err != nil {
     fmt.Printf("Error getting data from API URL \"%s\".\n", xmrstakApiUrl)
@@ -49,7 +55,7 @@ func getHashrate() float64 {
 
   json.Unmarshal(body, &responseData)
 
-	return responseData.HashRate.Total[0]
+	return responseData
 }
 
 func init() {
@@ -59,9 +65,69 @@ func init() {
       Name: "hashrate_total",
 		  Help: "Total hashrate considering all devices",
     },
-    func() float64 { return getHashrate() },
+    func() float64 {
+      xmrstakApiData := getXmrstakData()
+
+      return xmrstakApiData.HashRate.Total[0]
+    },
   )); err == nil {
     fmt.Println("Registered hashrate_total gauge")
+  }
+
+  if err := prometheus.Register(prometheus.NewGaugeFunc(
+    prometheus.GaugeOpts{
+      Name: "difficulty",
+		  Help: "Hashing difficulty",
+    },
+    func() float64 {
+      xmrstakApiData := getXmrstakData()
+
+      return float64(xmrstakApiData.Results.Difficulty)
+    },
+  )); err == nil {
+    fmt.Println("Registered difficulty gauge")
+  }
+
+  if err := prometheus.Register(prometheus.NewGaugeFunc(
+    prometheus.GaugeOpts{
+      Name: "avg_result_time",
+		  Help: "Average time to submit a valid hash result",
+    },
+    func() float64 {
+      xmrstakApiData := getXmrstakData()
+
+      return float64(xmrstakApiData.Results.AvgResultTime)
+    },
+  )); err == nil {
+    fmt.Println("Registered avg_result_time gauge")
+  }
+
+  if err := prometheus.Register(prometheus.NewGaugeFunc(
+    prometheus.GaugeOpts{
+      Name: "results_accepted",
+		  Help: "Hash results accepted by mining pool",
+    },
+    func() float64 {
+      xmrstakApiData := getXmrstakData()
+
+      return float64(xmrstakApiData.Results.SharesGood)
+    },
+  )); err == nil {
+    fmt.Println("Registered results_accepted gauge")
+  }
+
+  if err := prometheus.Register(prometheus.NewGaugeFunc(
+    prometheus.GaugeOpts{
+      Name: "results_total",
+		  Help: "Hash results submitted to mining pool",
+    },
+    func() float64 {
+      xmrstakApiData := getXmrstakData()
+
+      return float64(xmrstakApiData.Results.SharesTotal)
+    },
+  )); err == nil {
+    fmt.Println("Registered results_total gauge")
   }
 }
 
