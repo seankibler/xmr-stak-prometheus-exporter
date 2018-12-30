@@ -62,7 +62,7 @@ func init() {
 	// Metrics have to be registered to be exposed:
   if err := prometheus.Register(prometheus.NewGaugeFunc(
     prometheus.GaugeOpts{
-      Name: "hashrate_total",
+      Name: "xmrstak_hashrate_total",
 		  Help: "Total hashrate considering all devices",
     },
     func() float64 {
@@ -71,12 +71,12 @@ func init() {
       return xmrstakApiData.HashRate.Total[0]
     },
   )); err == nil {
-    fmt.Println("Registered hashrate_total gauge")
+    fmt.Println("Registered xmrstak_hashrate_total gauge")
   }
 
   if err := prometheus.Register(prometheus.NewGaugeFunc(
     prometheus.GaugeOpts{
-      Name: "difficulty",
+      Name: "xmrstak_difficulty",
 		  Help: "Hashing difficulty",
     },
     func() float64 {
@@ -85,12 +85,12 @@ func init() {
       return float64(xmrstakApiData.Results.Difficulty)
     },
   )); err == nil {
-    fmt.Println("Registered difficulty gauge")
+    fmt.Println("Registered xmrstak_difficulty gauge")
   }
 
   if err := prometheus.Register(prometheus.NewGaugeFunc(
     prometheus.GaugeOpts{
-      Name: "avg_result_time",
+      Name: "xmrstak_avg_result_time",
 		  Help: "Average time to submit a valid hash result",
     },
     func() float64 {
@@ -99,12 +99,12 @@ func init() {
       return float64(xmrstakApiData.Results.AvgResultTime)
     },
   )); err == nil {
-    fmt.Println("Registered avg_result_time gauge")
+    fmt.Println("Registered xmrstak_avg_result_time gauge")
   }
 
   if err := prometheus.Register(prometheus.NewGaugeFunc(
     prometheus.GaugeOpts{
-      Name: "results_accepted",
+      Name: "xmrstak_results_accepted",
 		  Help: "Hash results accepted by mining pool",
     },
     func() float64 {
@@ -113,12 +113,12 @@ func init() {
       return float64(xmrstakApiData.Results.SharesGood)
     },
   )); err == nil {
-    fmt.Println("Registered results_accepted gauge")
+    fmt.Println("Registered xmrstak_results_accepted gauge")
   }
 
   if err := prometheus.Register(prometheus.NewGaugeFunc(
     prometheus.GaugeOpts{
-      Name: "results_total",
+      Name: "xmrstak_results_total",
 		  Help: "Hash results submitted to mining pool",
     },
     func() float64 {
@@ -127,7 +127,7 @@ func init() {
       return float64(xmrstakApiData.Results.SharesTotal)
     },
   )); err == nil {
-    fmt.Println("Registered results_total gauge")
+    fmt.Println("Registered xmrstak_results_total gauge")
   }
 }
 
